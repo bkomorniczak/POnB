@@ -27,4 +27,14 @@ public class NodeRegistry {
       node.setHealthy(isHealthy);
     }
   }
+
+  public void addNewNode(Node node) {
+    nodes.registerNode(node);
+    System.out.println("Node registered: " + node);
+  }
+
+  public Node findNodeById(String nodeId) {
+    return nodes.getNode(nodeId);
+  }
+
 }

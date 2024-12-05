@@ -35,10 +35,10 @@ public class DistributedSystemManager {
     try {
       Node nextNode = loadBalancerService.getNextNode(getHealthyNodes());
       Message message = new Message("selfId", nextNode.getId(), request, MessageType.REQUEST);
-      communicationService.sendMessage(nextNode, message);
+      communicationService.sendMessage(nextNode, String.valueOf(message));
     } catch (IllegalStateException e) {
       System.err.println("No healthy nodes available: " + e.getMessage());
-    } catch (IOException e) {
+    } catch (Exception e) {
       System.err.println("Failed to send message: " + e.getMessage());
     }
   }

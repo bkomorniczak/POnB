@@ -6,6 +6,8 @@ public class Node {
   private int port;
   private String ipAddress;
   private boolean healthy;
+
+
   private long lastHeartbeatTime;
 
   public Node(String id, String host, int port) {
@@ -87,5 +89,9 @@ public class Node {
   @Override
   public int hashCode() {
     return id.hashCode() + host.hashCode() + port;
+  }
+
+  public void setLastHeartbeatTime(long lastHeartbeatTime) {
+    this.lastHeartbeatTime = lastHeartbeatTime;
   }
 }

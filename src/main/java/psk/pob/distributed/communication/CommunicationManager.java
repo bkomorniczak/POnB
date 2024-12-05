@@ -1,12 +1,12 @@
 package psk.pob.distributed.communication;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import org.springframework.stereotype.Component;
 import psk.pob.distributed.models.Node;
 
+@Component
 public class CommunicationManager {
 
   public void sendMessage(Node node, String message) {
@@ -18,13 +18,19 @@ public class CommunicationManager {
     }
   }
 
-  public String receiveMessage(Node node) {
-    try (Socket socket = new Socket(node.getIpAddress(), node.getPort());
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-      return in.readLine();
-    } catch (IOException e) {
-      System.err.println("Failed to receive message from node: " + node.getId());
-      return null;
+  public void receiveMessage(String message, Node sender) {
+    if ("HEARTBEAT_RESPONSE".equals(message)) {
+      sender.setHealthy(true);
+      sender.setLastHeartbeatTime(System.currentTimeMillis());
+    } else {
+      System.out.println("Received message: " + message + " from node: " + sender);
+    }
+  }
+  public void handleIncomingMessages() {
+    while (true) {
+      String incomingMessage = listenForMessages(); // Your existing method
+      Node sender = identifySender(incomingMessage); // Parse sender from message
+      receiveMessage(incomingMessage, sender);
     }
   }
 }

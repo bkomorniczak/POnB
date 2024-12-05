@@ -1,6 +1,5 @@
 package psk.pob.distributed.communication;
 
-import java.io.IOException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import psk.pob.distributed.models.Message;
@@ -22,9 +21,9 @@ public class NodeHealthService {
     nodes.forEach(node -> {
       try {
         Message heartbeat = new Message("selfId", node.getId(), "heartbeat", MessageType.REQUEST);
-        communicationService.sendMessage(node, heartbeat);
+        communicationService.sendMessage(node, String.valueOf(heartbeat));
         systemManager.updateNodeStatus(node, true);
-      } catch (IOException e) {
+      } catch (Exception e) {
         systemManager.updateNodeStatus(node, false);
       }
     });
