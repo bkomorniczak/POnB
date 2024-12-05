@@ -1,0 +1,14 @@
+node:
+  id: ${NODE_ID:1}
+  host: ${NODE_HOST:127.0.0.1}
+  port: ${NODE_PORT:8080}
+
+cluster:
+  nodes:
+    - 127.0.0.1:8081
+    - 127.0.0.1:8082
+    - 127.0.0.1:8083
+
+heartbeat:
+  interval: 5000
+  timeout: 15000
