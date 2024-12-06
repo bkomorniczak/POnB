@@ -1,10 +1,12 @@
 package psk.pob.distributed.communication.algorithms;
 
 import java.util.List;
+import org.springframework.stereotype.Component;
 import psk.pob.distributed.communication.CommunicationService;
 import psk.pob.distributed.models.Message;
 import psk.pob.distributed.models.Node;
 
+@Component
 public class BroadcastAlgorithm implements CommunicationAlgorithm {
 
   @Override

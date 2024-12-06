@@ -10,10 +10,15 @@ import psk.pob.distributed.models.NodeRegistry;
 
 @Component
 public class DistributedSystemManager {
+  private final NodeRegistry nodeRegistry;
+  private final CommunicationService communicationService;
   private CommunicationAlgorithm communicationAlgorithm;
 
-  public DistributedSystemManager(CommunicationAlgorithm algorithm) {
-    this.communicationAlgorithm = algorithm;
+  public DistributedSystemManager(NodeRegistry nodeRegistry,
+      CommunicationService communicationService, CommunicationAlgorithm communicationAlgorithm) {
+    this.nodeRegistry = nodeRegistry;
+    this.communicationService = communicationService;
+    this.communicationAlgorithm = communicationAlgorithm;
   }
 
   public void initializeNodes(List<Node> nodes) {

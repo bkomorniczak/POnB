@@ -10,12 +10,11 @@ import psk.pob.distributed.models.Message;
 @Component
 public class ServerHandler implements Runnable {
 
-  @Value("${server.port}")
-  private int port;
-
+  private final int port;
   private final CommunicationService communicationService;
 
-  public ServerHandler(CommunicationService communicationService) {
+  public ServerHandler(@Value("${server.port}") int port, CommunicationService communicationService) {
+    this.port = port;
     this.communicationService = communicationService;
   }
 
