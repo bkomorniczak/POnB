@@ -8,11 +8,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import psk.pob.distributed.models.Message;
 import psk.pob.distributed.models.Node;
 
 //provides higher level communication functionalities
+@Slf4j
 @Service
 public class CommunicationService {
   private final CommunicationManager communicationManager;
@@ -21,20 +23,12 @@ public class CommunicationService {
     this.communicationManager = communicationManager;
   }
 
-//  public boolean sendHeartbeat(Node node) {
-//    try {
-//      communicationManager.sendMessage(node, "HEARTBEAT");
-//      return true;
-//    } catch (Exception e) {
-//      return false;
-//    }
-//  }
   public void sendMessage(Node source, Node target, Message message) {
     try (Socket socket = new Socket(target.getHost(), target.getPort());
         ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
       out.writeObject(message);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
   public Message receiveMessage(Socket clientSocket) throws IOException {

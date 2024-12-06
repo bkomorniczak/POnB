@@ -1,6 +1,7 @@
 package psk.pob.distributed.communication;
 
 import java.util.List;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 import psk.pob.distributed.communication.algorithms.CommunicationAlgorithm;
 import psk.pob.distributed.models.Message;
@@ -12,6 +13,7 @@ import psk.pob.distributed.models.NodeRegistry;
 public class DistributedSystemManager {
   private final NodeRegistry nodeRegistry;
   private final CommunicationService communicationService;
+  @Setter
   private CommunicationAlgorithm communicationAlgorithm;
 
   public DistributedSystemManager(NodeRegistry nodeRegistry,
@@ -26,12 +28,9 @@ public class DistributedSystemManager {
   }
 
   public void sendMessage(Node source, Message message) {
-    List<Node> allNodes = NodeRegistry.getInstance().getAllNodes();
+    List<Node> allNodes = nodeRegistry.getAllNodes();
     communicationAlgorithm.communicate(source, allNodes, message);
   }
 
-  public void setCommunicationAlgorithm(CommunicationAlgorithm algorithm) {
-    this.communicationAlgorithm = algorithm;
-  }
 }
 

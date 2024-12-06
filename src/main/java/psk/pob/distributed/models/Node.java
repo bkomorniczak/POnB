@@ -1,13 +1,19 @@
 package psk.pob.distributed.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
 public class Node {
   private String id;
   private String host;
   private int port;
   private String ipAddress;
+  @Setter
   private boolean healthy;
 
 
+  @Setter
   private long lastHeartbeatTime;
 
   public Node(String id, String host, int port) {
@@ -30,34 +36,6 @@ public class Node {
 //      throw new IllegalArgumentException("Unable to resolve IP address for host: " + host, e);
 //    }
     return host + ":" + port;
-  }
-
-  public String getId() {
-    return id;
-  }
-
-  public String getHost() {
-    return host;
-  }
-
-  public String getIpAddress() {
-    return ipAddress;
-  }
-
-  public int getPort() {
-    return port;
-  }
-
-  public boolean isHealthy() {
-    return healthy;
-  }
-
-  public long getLastHeartbeatTime() {
-    return lastHeartbeatTime;
-  }
-
-  public void setHealthy(boolean healthy) {
-    this.healthy = healthy;
   }
 
   public void updateHeartbeatTime() {
@@ -91,7 +69,4 @@ public class Node {
     return id.hashCode() + host.hashCode() + port;
   }
 
-  public void setLastHeartbeatTime(long lastHeartbeatTime) {
-    this.lastHeartbeatTime = lastHeartbeatTime;
-  }
 }

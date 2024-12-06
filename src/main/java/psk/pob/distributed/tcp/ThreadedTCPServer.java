@@ -2,6 +2,7 @@ package psk.pob.distributed.tcp;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import psk.pob.distributed.models.Message;
 import psk.pob.distributed.models.Node;
 
@@ -10,6 +11,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 
+
+@Slf4j
 public class ThreadedTCPServer {
 
   public static void main(String[] args) {
@@ -30,20 +33,20 @@ public class ThreadedTCPServer {
     }
 
     List<Node> nodes = loadNodes();
-    System.out.println("Loaded nodes: " + nodes);
+    log.info("Loaded nodes: {}", nodes);
 
     try (ServerSocket serverSocket = new ServerSocket(port)) {
-      System.out.println("Server " + identifier + " is running on port " + port);
+      log.info("Server {} is running on port {}", identifier, port);
 
       while (true) {
         Socket clientSocket = serverSocket.accept();
-        System.out.println("New client connected: " + clientSocket.getInetAddress());
+        log.info("New client connected: {}", clientSocket.getInetAddress());
 
         // Handle the client in a new thread
         new Thread(() -> handleClient(clientSocket, nodes, identifier)).start();
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 

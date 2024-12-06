@@ -1,20 +1,23 @@
 package psk.pob.distributed.communication.algorithms;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import psk.pob.distributed.communication.CommunicationService;
 import psk.pob.distributed.models.Message;
 import psk.pob.distributed.models.Node;
 
+@Slf4j
 @Component
 public class BroadcastAlgorithm implements CommunicationAlgorithm {
 
+  CommunicationService communicationService;
   @Override
   public void communicate(Node source, List<Node> targets, Message message) {
     for (Node target : targets) {
       if (!target.equals(source)) {
-        System.out.println("Broadcasting message from " + source.getId() + " to " + target.getId());
-        CommunicationService.getInstance().sendMessage(source, target, message);
+        log.info("Broadcasting message from {} to {}", source.getId(), target.getId());
+        communicationService.sendMessage(source, target, message);
       }
     }
   }

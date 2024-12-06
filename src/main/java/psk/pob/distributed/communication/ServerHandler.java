@@ -3,10 +3,12 @@ package psk.pob.distributed.communication;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import psk.pob.distributed.models.Message;
 
+@Slf4j
 @Component
 public class ServerHandler implements Runnable {
 
@@ -26,7 +28,7 @@ public class ServerHandler implements Runnable {
         new Thread(() -> handleClient(clientSocket)).start();
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -35,23 +37,23 @@ public class ServerHandler implements Runnable {
       Message message = communicationService.receiveMessage(clientSocket);
       processMessage(message);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
   private void processMessage(Message message) {
     switch (message.getType()) {
       case REQUEST:
-        System.out.println("Processing request: " + message.getPayload());
+        log.info("Processing request: {}", message.getPayload());
         break;
       case RESPONSE:
-        System.out.println("Processing response: " + message.getPayload());
+        log.info("Processing response: {}", message.getPayload());
         break;
       case ERROR:
-        System.err.println("Error received: " + message.getPayload());
+        log.error("Error received: {}", message.getPayload());
         break;
       default:
-        System.out.println("Unknown message type: " + message.getType());
+        log.warn("Unknown message type: {}", message.getType());
         break;
     }
   }

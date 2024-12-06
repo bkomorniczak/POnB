@@ -3,10 +3,12 @@ package psk.pob.distributed.communication;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import psk.pob.distributed.models.Node;
 
 //Manages low-level communication details
+@Slf4j
 @Component
 public class CommunicationManager {
 
@@ -15,7 +17,7 @@ public class CommunicationManager {
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
       out.println(message);
     } catch (IOException e) {
-      System.err.println("Failed to send message to node: " + node.getId());
+      log.error("Failed to send message to node: {}", node.getId());
     }
   }
 
@@ -24,7 +26,7 @@ public class CommunicationManager {
       sender.setHealthy(true);
       sender.setLastHeartbeatTime(System.currentTimeMillis());
     } else {
-      System.out.println("Received message: " + message + " from node: " + sender);
+      log.info("Received message: {} from node: {}", message, sender);
     }
   }
   public void handleIncomingMessages() {

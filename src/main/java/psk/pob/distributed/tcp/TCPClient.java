@@ -1,12 +1,14 @@
 package psk.pob.distributed.tcp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import psk.pob.distributed.models.Message;
 
 import java.io.*;
 import java.net.Socket;
 import psk.pob.distributed.models.MessageType;
 
+@Slf4j
 public class TCPClient {
   public static void main(String[] args) {
     String host = "localhost";
@@ -24,7 +26,7 @@ public class TCPClient {
       sendMessageToInvalidRecipient(writer, reader, objectMapper);
 
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -35,13 +37,13 @@ public class TCPClient {
     writer.write(jsonMessage);
     writer.newLine();
     writer.flush();
-    System.out.println("Sent: " + jsonMessage);
+    log.info("Sent: {}", jsonMessage);
 
     String response = reader.readLine();
     if (response != null) {
-      System.out.println("Received: " + response);
+      log.info("Received: {}", response);
     } else {
-      System.out.println("No response received.");
+      log.info("No response received.");
     }
   }
 

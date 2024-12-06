@@ -7,15 +7,11 @@ public class CommunicationAlgorithmFactory {
   }
 
   public static CommunicationAlgorithm createAlgorithm(String type) {
-    switch (type.toLowerCase()) {
-      case "broadcast":
-        return new BroadcastAlgorithm();
-      case "leader":
-        return new LeaderBasedAlgorithm();
-      case "round-robin":
-        return new RoundRobinAlgorithm();
-      default:
-        throw new IllegalArgumentException("Unknown algorithm type: " + type);
-    }
+    return switch (type.toLowerCase()) {
+      case "broadcast" -> new BroadcastAlgorithm();
+      case "leader" -> new LeaderBasedAlgorithm();
+      case "round-robin" -> new RoundRobinAlgorithm();
+      default -> throw new IllegalArgumentException("Unknown algorithm type: " + type);
+    };
   }
 }
