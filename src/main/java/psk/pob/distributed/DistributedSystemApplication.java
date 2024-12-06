@@ -6,10 +6,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import psk.pob.distributed.communication.CommunicationService;
 import psk.pob.distributed.communication.DistributedSystemManager;
 import psk.pob.distributed.communication.algorithms.CommunicationAlgorithm;
 import psk.pob.distributed.communication.algorithms.CommunicationAlgorithmFactory;
@@ -24,6 +26,7 @@ public class DistributedSystemApplication {
 
   public static void main(String[] args) {
     ApplicationContext context = SpringApplication.run(DistributedSystemApplication.class, args);
+    CommunicationService communicationService = context.getBean(CommunicationService.class);
 
     NodeRegistry nodeRegistry = context.getBean(NodeRegistry.class);
     String LOCAL_HOST = "127.0.0.1";
@@ -41,7 +44,7 @@ public class DistributedSystemApplication {
 
     // Start servers for each node
     for (Node node : nodeRegistry.getAllNodes()) {
-      new Thread(() -> startServer(node.getPort())).start();
+      new Thread(() -> startServer(node.getPort(), nodeRegistry, communicationService)).start();
     }
 
     // Send a test message
@@ -50,38 +53,90 @@ public class DistributedSystemApplication {
     manager.sendMessage(sourceNode, message);
   }
 
-  private static void startServer(int port) {
+  private static void startServer(int port, NodeRegistry nodeRegistry, CommunicationService communicationService) {
     try (ServerSocket serverSocket = new ServerSocket(port)) {
-      System.out.println("Server started on port " + port);
+      log.info("Server started on port {}", port);
       while (true) {
         Socket clientSocket = serverSocket.accept();
-        System.out.println("Connection received on port " + port);
+        log.info("Connection received on port {}", port);
 
-        // Handle incoming messages
         new Thread(() -> {
           try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())) {
             Message message = (Message) in.readObject();
-            System.out.println("Message received on port " + port + ": " + message);
+            log.info("Message received on port {}: {}", port, message);
 
-            // Process the message (this could include updating state, forwarding, etc.)
-            processMessage(message, port);
+            processMessage(message, port, nodeRegistry, communicationService);
           } catch (IOException | ClassNotFoundException e) {
-            System.err.println("Error while reading message: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error while reading message: {}", e.getMessage());
           }
         }).start();
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("Error while starting server on port {}: {}", port, e.getMessage());
     }
   }
 
-  private static void processMessage(Message message, int port) {
-    System.out.printf("Processing message on port %d: %s%n", port, message);
-    // Add logic for processing the message here
-    // e.g., updating node states, replying to sender, etc.
+  private static void processMessage(Message message, int port, NodeRegistry nodeRegistry, CommunicationService communicationService) {
+    log.info("Processing message on port {}: {}", port, message);
+    Node senderNode = nodeRegistry.getNode(message.getSenderId());
+    if (senderNode != null) {
+      senderNode.setLastHeartbeatTime(System.currentTimeMillis());
+      senderNode.setHealthy(true);
+      log.info("Updated state of node {}}: Healthy=true, LastHeartbeatTime={}%n",
+          senderNode.getId(), senderNode.getLastHeartbeatTime());
+    } else {
+      log.error("Unknown sender node: {}", message.getSenderId());
+    }
+
+    if (message.getType() == MessageType.REQUEST) {
+      Message response = new Message(
+          "Server on port " + port,
+          message.getSenderId(),
+          "Acknowledged",
+          MessageType.RESPONSE
+      );
+      sendResponse(response, senderNode, communicationService);
+    }
+
+    if (message.getType() == MessageType.REQUEST) {
+      forwardMessage(message, port, nodeRegistry, communicationService);
+    }
   }
 
+  private static void sendResponse(Message response, Node targetNode,
+      CommunicationService communicationService) {
+    try {
+      if (targetNode != null) {
+        communicationService.sendMessage(
+            new Node("Server", "127.0.0.1", targetNode.getPort()),
+            targetNode,
+            response
+        );
+        log.info("Sent acknowledgment to {}", targetNode.getId());
+      }
+    } catch (Exception e) {
+      log.error("Failed to send response to node {}: {}%n", targetNode.getId(),
+          e.getMessage());
+    }
+  }
 
+  private static void forwardMessage(Message message, int port, NodeRegistry nodeRegistry,
+      CommunicationService communicationService) {
+    List<Node> allNodes = nodeRegistry.getAllNodes();
+    for (Node node : allNodes) {
+      if (node.getPort() != port) { // Don't forward back to the original sender
+        try {
+          log.info("Forwarding message to node {}", node.getId());
+          communicationService.sendMessage(
+              new Node("Server", "127.0.0.1", port),
+              node,
+              message
+          );
+        } catch (Exception e) {
+          log.error("Failed to forward message to node {}: {}%n", node.getId(),
+              e.getMessage());
+        }
+      }
+    }
+  }
 }
-
