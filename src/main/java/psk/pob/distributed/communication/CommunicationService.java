@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import psk.pob.distributed.controller.MetricsService;
 import psk.pob.distributed.models.Message;
 import psk.pob.distributed.models.Node;
 
@@ -18,7 +19,10 @@ import psk.pob.distributed.models.Node;
 @Component
 public class CommunicationService {
 
-  public CommunicationService() {
+  private final MetricsService metricsService;
+
+  public CommunicationService(MetricsService metricsService) {
+    this.metricsService = metricsService;
   }
 
   public void sendMessage(Node source, Node target, Message message) {
@@ -26,6 +30,7 @@ public class CommunicationService {
         ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
       log.info("Sending message from {} to {}", source.getId(), target.getId());
       out.writeObject(message);
+      metricsService.incrementMessagesSent();
     } catch (IOException e) {
       log.error("Failed to send message from {} to {}: {}", source.getId(), target.getId(), e.getMessage());
     }
@@ -34,6 +39,7 @@ public class CommunicationService {
   public Message receiveMessage(Socket clientSocket) throws IOException {
     try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
       String jsonMessage = in.readLine();
+      metricsService.incrementMessagesReceived();
       return deserializeMessage(jsonMessage);
     }
   }
