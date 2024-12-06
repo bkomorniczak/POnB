@@ -9,28 +9,28 @@ import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import psk.pob.distributed.models.Message;
 import psk.pob.distributed.models.Node;
 
 //provides higher level communication functionalities
 @Slf4j
-@Service
+@Component
 public class CommunicationService {
-  private final CommunicationManager communicationManager;
 
-  public CommunicationService(CommunicationManager communicationManager) {
-    this.communicationManager = communicationManager;
+  public CommunicationService() {
   }
 
   public void sendMessage(Node source, Node target, Message message) {
     try (Socket socket = new Socket(target.getHost(), target.getPort());
         ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
+      log.info("Sending message from {} to {}", source.getId(), target.getId());
       out.writeObject(message);
     } catch (IOException e) {
-      log.error(e.getMessage(), e);
+      log.error("Failed to send message from {} to {}: {}", source.getId(), target.getId(), e.getMessage());
     }
   }
+
   public Message receiveMessage(Socket clientSocket) throws IOException {
     try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
       String jsonMessage = in.readLine();

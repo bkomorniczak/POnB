@@ -1,19 +1,14 @@
 package psk.pob.distributed.models;
 
-import lombok.Getter;
 import lombok.Setter;
 
-@Getter
+
 public class Node {
   private String id;
   private String host;
   private int port;
   private String ipAddress;
-  @Setter
   private boolean healthy;
-
-
-  @Setter
   private long lastHeartbeatTime;
 
   public Node(String id, String host, int port) {
@@ -26,6 +21,54 @@ public class Node {
   }
 
   public Node() {
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public void setHost(String host) {
+    this.host = host;
+  }
+
+  public void setPort(int port) {
+    this.port = port;
+  }
+
+  public void setIpAddress(String ipAddress) {
+    this.ipAddress = ipAddress;
+  }
+
+  public void setHealthy(boolean healthy) {
+    this.healthy = healthy;
+  }
+
+  public void setLastHeartbeatTime(long lastHeartbeatTime) {
+    this.lastHeartbeatTime = lastHeartbeatTime;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public String getHost() {
+    return host;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public String getIpAddress() {
+    return ipAddress;
+  }
+
+  public boolean isHealthy() {
+    return healthy;
+  }
+
+  public long getLastHeartbeatTime() {
+    return lastHeartbeatTime;
   }
 
   private String resolveIpAddress(String host, int port) {

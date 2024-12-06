@@ -23,4 +23,10 @@ public class NodeRegistry {
   public Node getNode(String nodeId) {
     return nodes.get(nodeId);
   }
+
+  public void registerNodes(List<Node> multipleNodes) {
+    for (Node node : multipleNodes) {
+      nodes.put(node.getId(), node);
+    }
+  }
 }
