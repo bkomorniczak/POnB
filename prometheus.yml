@@ -2,17 +2,9 @@ global:
   scrape_interval: 5s
 
 scrape_configs:
-  - job_name: "node1"
-    metrics_path: "/actuator/prometheus"
+  - job_name: 'distributed-system'
     static_configs:
-      - targets: ["node1:8081"]
-
-  - job_name: "node2"
-    metrics_path: "/actuator/prometheus"
-    static_configs:
-      - targets: ["node2:8082"]
-
-  - job_name: "node3"
-    metrics_path: "/actuator/prometheus"
-    static_configs:
-      - targets: ["node3:8083"]
+      - targets:
+          - 'node1:8080'
+          - 'node2:8080'
+          - 'node3:8080'

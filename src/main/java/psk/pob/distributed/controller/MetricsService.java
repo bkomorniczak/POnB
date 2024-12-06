@@ -2,29 +2,25 @@ package psk.pob.distributed.controller;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class MetricsService {
 
-  private final Counter messagesSentCounter;
-  private final Counter messagesReceivedCounter;
+  private final Counter messagesSent;
+  private final Counter messagesReceived;
 
   public MetricsService(MeterRegistry meterRegistry) {
-    this.messagesSentCounter = Counter.builder("messages_sent_total")
-        .description("Total number of messages sent")
-        .register(meterRegistry);
-    this.messagesReceivedCounter = Counter.builder("messages_received_total")
-        .description("Total number of messages received")
-        .register(meterRegistry);
+    this.messagesSent = meterRegistry.counter("messages_sent_total");
+    this.messagesReceived = meterRegistry.counter("messages_received_total");
   }
 
   public void incrementMessagesSent() {
-    messagesSentCounter.increment();
+    messagesSent.increment();
   }
 
   public void incrementMessagesReceived() {
-    messagesReceivedCounter.increment();
+    messagesReceived.increment();
   }
 }
 

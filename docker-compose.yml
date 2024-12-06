@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  monitoring_network:
+    driver: bridge
+
 services:
   node1:
     build: .
@@ -11,6 +15,9 @@ services:
       - ALGORITHM_TYPE=leader
     ports:
       - "8081:8081"
+    networks:
+      - monitoring_network
+
 
   node2:
     build: .
@@ -22,6 +29,9 @@ services:
       - ALGORITHM_TYPE=broadcast
     ports:
       - "8082:8082"
+    networks:
+      - monitoring_network
+
 
   node3:
     build: .
@@ -33,6 +43,9 @@ services:
       - ALGORITHM_TYPE=round-robin
     ports:
       - "8083:8083"
+    networks:
+      - monitoring_network
+
 
   prometheus:
     image: prom/prometheus:latest
@@ -40,8 +53,23 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
+    networks:
+      - monitoring_network
+
 
   grafana:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
+    networks:
+      - monitoring_network
+
+
+  aggregator:
+    build: .
+    environment:
+      - NODE_ADDRESSES=http://node1:8081,http://node2:8082,http://node3:8083
+    ports:
+      - "8080:8080"  # Expose the dashboard
+    networks:
+      - monitoring_network
