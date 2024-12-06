@@ -1,7 +1,5 @@
 package psk.pob.distributed;
 
-import static psk.pob.distributed.models.MessageType.REQUEST;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
@@ -36,7 +34,7 @@ public class DistributedSystemApplication {
     nodeRegistry.registerNode(new Node("3", LOCAL_HOST, 8083));
 
     CommunicationAlgorithmFactory factory = context.getBean(CommunicationAlgorithmFactory.class);
-    CommunicationAlgorithm algorithm = factory.createAlgorithm("broadcast");
+    CommunicationAlgorithm algorithm = factory.createAlgorithm("leader");
 
     DistributedSystemManager manager = context.getBean(DistributedSystemManager.class);
     manager.setCommunicationAlgorithm(algorithm);
@@ -49,7 +47,7 @@ public class DistributedSystemApplication {
 
     // Send a test message
     Node sourceNode = nodeRegistry.getAllNodes().get(0);
-    Message message = new Message("Sender", "Receiver", "Payload", MessageType.REQUEST);
+    Message message = new Message("1", "Receiver", "Payload", MessageType.REQUEST);
     manager.sendMessage(sourceNode, message);
   }
 
