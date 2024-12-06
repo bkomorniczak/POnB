@@ -6,6 +6,7 @@ import java.net.Socket;
 import org.springframework.stereotype.Component;
 import psk.pob.distributed.models.Node;
 
+//Manages low-level communication details
 @Component
 public class CommunicationManager {
 

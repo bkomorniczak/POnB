@@ -20,14 +20,12 @@ public class DistributedSystemApplication {
     CommunicationService communicationService = new CommunicationService(communicationManager);
     HeartbeatManager heartbeatManager = new HeartbeatManager(nodeRegistry, communicationService);
 
-    // Register initial nodes
+    // Register nodes
     Node node1 = new Node("1", "127.0.0.1", 8081);
     nodeRegistry.registerNode(node1);
+    // Register additional nodes as needed
 
-    // Start heartbeat monitoring
-    heartbeatManager.startHeartbeat();
-
-    // Start listening for messages
-    communicationService.listenForMessages();
+    // Start heartbeat checks
+    heartbeatManager.start();
   }
 }

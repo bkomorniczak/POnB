@@ -6,15 +6,17 @@ import java.net.Socket;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import psk.pob.distributed.models.Message;
+import psk.pob.distributed.models.MessageType;
 
 @Component
 public class ServerHandler implements Runnable {
 
-  private final int port;
+  @Value("${server.port}")
+  private int port;
+
   private final CommunicationService communicationService;
 
-  public ServerHandler(@Value("${server.port}") int port, CommunicationService communicationService) {
-    this.port = port;
+  public ServerHandler(CommunicationService communicationService) {
     this.communicationService = communicationService;
   }
 
@@ -42,11 +44,19 @@ public class ServerHandler implements Runnable {
   private void processMessage(Message message) {
     switch (message.getType()) {
       case REQUEST:
+        System.out.println("Processing request: " + message.getPayload());
         break;
       case RESPONSE:
+        System.out.println("Processing response: " + message.getPayload());
         break;
       case ERROR:
+        System.err.println("Error received: " + message.getPayload());
+        break;
+      default:
+        System.out.println("Unknown message type: " + message.getType());
         break;
     }
   }
 }
+
+

@@ -1,40 +1,26 @@
 package psk.pob.distributed.models;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+//maintains registry of active nodes
 public class NodeRegistry {
-  private final Map<String, Node> nodes = new HashMap<>();
+  private final Map<String, Node> nodes = new ConcurrentHashMap<>();
 
-  public void registerNode(String id, String host, int port) {
-    Node node = new Node(id, host, port);
-    nodes.put(id, node);
+  public void registerNode(Node node) {
+    nodes.put(node.getId(), node);
   }
 
-  public Node getNode(String id) {
-    return nodes.get(id);
+  public Node getNode(String nodeId) {
+    return nodes.get(nodeId);
   }
 
-  public List<Node> getAllNodes() {
-    return new ArrayList<>(nodes.values());
+  public Collection<Node> getAllNodes() {
+    return nodes.values();
   }
-
-  public void updateNodeHealth(String id, boolean isHealthy) {
-    Node node = nodes.get(id);
-    if (node != null) {
-      node.setHealthy(isHealthy);
-    }
-  }
-
-  public void addNewNode(Node node) {
-    nodes.registerNode(node);
-    System.out.println("Node registered: " + node);
-  }
-
-  public Node findNodeById(String nodeId) {
-    return nodes.getNode(nodeId);
-  }
-
 }
+
