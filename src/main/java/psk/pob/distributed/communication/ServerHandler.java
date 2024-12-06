@@ -6,7 +6,6 @@ import java.net.Socket;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import psk.pob.distributed.models.Message;
-import psk.pob.distributed.models.MessageType;
 
 @Component
 public class ServerHandler implements Runnable {

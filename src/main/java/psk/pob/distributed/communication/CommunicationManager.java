@@ -29,8 +29,8 @@ public class CommunicationManager {
   }
   public void handleIncomingMessages() {
     while (true) {
-      String incomingMessage = listenForMessages(); // Your existing method
-      Node sender = identifySender(incomingMessage); // Parse sender from message
+      String incomingMessage = listenForMessages();
+      Node sender = identifySender(incomingMessage);
       receiveMessage(incomingMessage, sender);
     }
   }

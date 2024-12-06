@@ -1,31 +1,38 @@
 package psk.pob.distributed;
 
-import org.springframework.boot.SpringApplication;
+import static psk.pob.distributed.models.MessageType.REQUEST;
+
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import psk.pob.distributed.communication.CommunicationManager;
-import psk.pob.distributed.communication.CommunicationService;
 import psk.pob.distributed.communication.DistributedSystemManager;
-import psk.pob.distributed.communication.HeartbeatManager;
+import psk.pob.distributed.communication.algorithms.CommunicationAlgorithm;
+import psk.pob.distributed.communication.algorithms.CommunicationAlgorithmFactory;
+import psk.pob.distributed.models.Message;
 import psk.pob.distributed.models.Node;
 import psk.pob.distributed.models.NodeRegistry;
 
 @SpringBootApplication
 public class DistributedSystemApplication {
 
-  public static void main(String[] args) {
-    NodeRegistry nodeRegistry = new NodeRegistry();
-    CommunicationManager communicationManager = new CommunicationManager();
-    CommunicationService communicationService = new CommunicationService(communicationManager);
-    HeartbeatManager heartbeatManager = new HeartbeatManager(nodeRegistry, communicationService);
+  public class Main {
+    public static void main(String[] args) {
+      NodeRegistry nodeRegistry = NodeRegistry.getInstance();
+      nodeRegistry.registerNode(new Node("1", "127.0.0.1", 8081));
+      nodeRegistry.registerNode(new Node("2", "127.0.0.1", 8082));
+      nodeRegistry.registerNode(new Node("3", "127.0.0.1", 8083));
 
-    // Register nodes
-    Node node1 = new Node("1", "127.0.0.1", 8081);
-    nodeRegistry.registerNode(node1);
-    // Register additional nodes as needed
+      String algorithmType = System.getenv("ALGORITHM_TYPE"); // Example: leader, broadcast, round-robin
+      if (algorithmType == null) {
+        algorithmType = "broadcast"; // Default to broadcast
+      }
 
-    // Start heartbeat checks
-    heartbeatManager.start();
+      CommunicationAlgorithm algorithm = CommunicationAlgorithmFactory.createAlgorithm(algorithmType);
+      DistributedSystemManager manager = new DistributedSystemManager(algorithm);
+      manager.initializeNodes(nodeRegistry.getAllNodes());
+
+      Node sourceNode = nodeRegistry.getAllNodes().get(0);
+      Message message = new Message("Sender", "Receiver", "Payload", REQUEST);
+      manager.sendMessage(sourceNode, message);
+    }
   }
+
 }

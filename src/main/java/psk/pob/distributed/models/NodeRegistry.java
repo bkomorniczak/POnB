@@ -1,8 +1,5 @@
 package psk.pob.distributed.models;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,8 +16,8 @@ public class NodeRegistry {
     return nodes.get(nodeId);
   }
 
-  public Collection<Node> getAllNodes() {
-    return nodes.values();
+  public List<Node> getAllNodes() {
+    return (List<Node>) nodes.values();
   }
 }
 

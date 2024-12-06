@@ -30,3 +30,15 @@ services:
       - CLUSTER_NODES=127.0.0.1:8081,127.0.0.1:8082
     ports:
       - "8083:8083"
+  distributed-node1:
+    build: .
+    environment:
+      - ALGORITHM_TYPE=leader
+  distributed-node2:
+    build: .
+    environment:
+      - ALGORITHM_TYPE=broadcast
+  distributed-node3:
+    build: .
+    environment:
+      - ALGORITHM_TYPE=round-robin

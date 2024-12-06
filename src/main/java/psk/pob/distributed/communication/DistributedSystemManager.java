@@ -1,55 +1,32 @@
 package psk.pob.distributed.communication;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import psk.pob.distributed.communication.algorithms.CommunicationAlgorithm;
 import psk.pob.distributed.models.Message;
-import psk.pob.distributed.models.MessageType;
 import psk.pob.distributed.models.Node;
+import psk.pob.distributed.models.NodeRegistry;
 
-@Service
+
+@Component
 public class DistributedSystemManager {
+  private CommunicationAlgorithm communicationAlgorithm;
 
-  private final LoadBalancerService loadBalancerService;
-  private final NodeHealthService nodeHealthService;
-  private final CommunicationService communicationService;
-  private final List<Node> nodes;
-
-  public DistributedSystemManager(LoadBalancerService loadBalancerService,
-      NodeHealthService nodeHealthService,
-      CommunicationService communicationService) {
-    this.loadBalancerService = loadBalancerService;
-    this.nodeHealthService = nodeHealthService;
-    this.communicationService = communicationService;
-    this.nodes = new ArrayList<>();
+  public DistributedSystemManager(CommunicationAlgorithm algorithm) {
+    this.communicationAlgorithm = algorithm;
   }
 
-//  public void initialize() {
-//    nodes.add(new Node("Node1", "127.0.0.1", 8080));
-//    nodes.add(new Node("Node2", "127.0.0.1", 8081));
-//    nodeHealthService.startMonitoring(nodes);
-//  }
-//
-//  public void processRequest(String request) {
-//    try {
-//      Node nextNode = loadBalancerService.getNextNode(getHealthyNodes());
-//      Message message = new Message("selfId", nextNode.getId(), request, MessageType.REQUEST);
-//      communicationService.sendMessage(nextNode, String.valueOf(message));
-//    } catch (IllegalStateException e) {
-//      System.err.println("No healthy nodes available: " + e.getMessage());
-//    } catch (Exception e) {
-//      System.err.println("Failed to send message: " + e.getMessage());
-//    }
-//  }
-
-  public List<Node> getHealthyNodes() {
-    return nodes.stream()
-        .filter(Node::isHealthy)
-        .toList();
+  public void initializeNodes(List<Node> nodes) {
+    communicationAlgorithm.initialize(nodes);
   }
 
-  public void updateNodeStatus(Node node, boolean isHealthy) {
-    node.setHealthy(isHealthy);
+  public void sendMessage(Node source, Message message) {
+    List<Node> allNodes = NodeRegistry.getInstance().getAllNodes();
+    communicationAlgorithm.communicate(source, allNodes, message);
+  }
+
+  public void setCommunicationAlgorithm(CommunicationAlgorithm algorithm) {
+    this.communicationAlgorithm = algorithm;
   }
 }
+

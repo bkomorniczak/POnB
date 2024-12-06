@@ -31,8 +31,7 @@ public class CommunicationService {
 
   public Message receiveMessage(Socket clientSocket) throws IOException {
     try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
-      String jsonMessage = in.readLine(); // Assuming one line per message
-      // Deserialize JSON to a Message object
+      String jsonMessage = in.readLine();
       return deserializeMessage(jsonMessage);
     }
   }
