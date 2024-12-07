@@ -1,5 +1,6 @@
 package psk.pob.distributed;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
@@ -23,6 +24,10 @@ import psk.pob.distributed.models.NodeRegistry;
 public class DistributedSystemApplication {
 
   public static void main(String[] args) {
+    File logDir = new File("./logs");
+    if (!logDir.exists()) {
+      logDir.mkdirs();
+    }
     ApplicationContext context = SpringApplication.run(DistributedSystemApplication.class, args);
     CommunicationService communicationService = context.getBean(CommunicationService.class);
 

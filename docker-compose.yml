@@ -17,7 +17,8 @@ services:
       - "8081:8081"
     networks:
       - monitoring_network
-
+    volumes:
+      - ./logs:/app/logs  # Shared volume for logs
 
   node2:
     build: .
@@ -31,7 +32,8 @@ services:
       - "8082:8082"
     networks:
       - monitoring_network
-
+    volumes:
+      - ./logs:/app/logs
 
   node3:
     build: .
@@ -45,17 +47,17 @@ services:
       - "8083:8083"
     networks:
       - monitoring_network
-
-
-  prometheus:
-    image: prom/prometheus:latest
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    networks:
-      - monitoring_network
+      - ./logs:/app/logs
 
+#  prometheus:
+#    image: prom/prometheus:latest
+#    volumes:
+#      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+#    ports:
+#      - "9090:9090"
+#    networks:
+#      - monitoring_network
 
   grafana:
     image: grafana/grafana:latest
@@ -63,13 +65,15 @@ services:
       - "3000:3000"
     networks:
       - monitoring_network
+    depends_on:
+      - loki
 
-
-  aggregator:
-    build: .
-    environment:
-      - NODE_ADDRESSES=http://node1:8081,http://node2:8082,http://node3:8083
+  loki:
+    image: grafana/loki:latest
     ports:
-      - "8080:8080"  # Expose the dashboard
+      - "3100:3100"
     networks:
       - monitoring_network
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
