@@ -1,7 +1,5 @@
 package psk.pob.distributed.models;
 
-import lombok.Setter;
-
 
 public class Node {
   private String id;
@@ -10,6 +8,7 @@ public class Node {
   private String ipAddress;
   private boolean healthy;
   private long lastHeartbeatTime;
+  private boolean simulatedFailure;
 
   public Node(String id, String host, int port) {
     this.id = id;
@@ -18,6 +17,7 @@ public class Node {
     this.ipAddress = resolveIpAddress(host, port);
     this.healthy = true;
     this.lastHeartbeatTime = System.currentTimeMillis();
+    this.simulatedFailure = false;
   }
 
   public Node() {
@@ -112,4 +112,11 @@ public class Node {
     return id.hashCode() + host.hashCode() + port;
   }
 
+  public boolean isSimulatedFailure() {
+    return simulatedFailure;
+  }
+
+  public void setSimulatedFailure(boolean simulatedFailure) {
+    this.simulatedFailure = simulatedFailure;
+  }
 }

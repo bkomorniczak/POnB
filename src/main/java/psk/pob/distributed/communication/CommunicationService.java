@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import psk.pob.distributed.controller.MetricsService;
@@ -19,6 +20,8 @@ import psk.pob.distributed.models.Node;
 @Component
 public class CommunicationService {
 
+  private final Random random = new Random();
+
   private final MetricsService metricsService;
 
   public CommunicationService(MetricsService metricsService) {
@@ -26,6 +29,10 @@ public class CommunicationService {
   }
 
   public void sendMessage(Node source, Node target, Message message) {
+    if ( random.nextDouble() <0.2 ) {
+      log.info("Dropping message from {} to {}", source.getId(), target.getId());
+      return;
+    }
     try (Socket socket = new Socket(target.getHost(), target.getPort());
         ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
       log.info("Sending message from {} to {}", source.getId(), target.getId());
