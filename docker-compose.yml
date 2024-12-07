@@ -18,7 +18,7 @@ services:
     networks:
       - monitoring_network
     volumes:
-      - ./logs:/app/logs  # Shared volume for logs
+      - ./logs:/var/log/app
 
   node2:
     build: .
@@ -33,7 +33,7 @@ services:
     networks:
       - monitoring_network
     volumes:
-      - ./logs:/app/logs
+      - ./logs:/var/log/app
 
   node3:
     build: .
@@ -48,16 +48,17 @@ services:
     networks:
       - monitoring_network
     volumes:
-      - ./logs:/app/logs
+      - ./logs:/var/log/app
 
-#  prometheus:
-#    image: prom/prometheus:latest
-#    volumes:
-#      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-#    ports:
-#      - "9090:9090"
-#    networks:
-#      - monitoring_network
+  loki:
+    image: grafana/loki:latest
+    container_name: distributed-loki
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+      - ./loki-data:/loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
 
   grafana:
     image: grafana/grafana:latest
@@ -65,15 +66,3 @@ services:
       - "3000:3000"
     networks:
       - monitoring_network
-    depends_on:
-      - loki
-
-  loki:
-    image: grafana/loki:latest
-    ports:
-      - "3100:3100"
-    networks:
-      - monitoring_network
-    volumes:
-      - ./loki-config.yml:/etc/loki/local-config.yaml
-    command: -config.file=/etc/loki/local-config.yaml

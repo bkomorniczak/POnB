@@ -7,6 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -19,15 +21,17 @@ import psk.pob.distributed.models.MessageType;
 import psk.pob.distributed.models.Node;
 import psk.pob.distributed.models.NodeRegistry;
 
-@Slf4j
+//@Slf4j
 @SpringBootApplication
 public class DistributedSystemApplication {
+  private static final Logger log = LoggerFactory.getLogger(DistributedSystemApplication.class);
 
   public static void main(String[] args) {
     File logDir = new File("./logs");
     if (!logDir.exists()) {
       logDir.mkdirs();
     }
+
     ApplicationContext context = SpringApplication.run(DistributedSystemApplication.class, args);
     CommunicationService communicationService = context.getBean(CommunicationService.class);
 
